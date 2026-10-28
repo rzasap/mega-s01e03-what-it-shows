@@ -79,6 +79,8 @@ const footnotes = groups
   .map((g) => `    <p class="note">${g.alsoShift} of the <code>${g.problem}</code> reports read as a one-day move: counted under <code>${g.problem}</code> by tenant, and under <code>shift</code>.</p>`)
   .join('\n');
 
+const page = fs.readFileSync(path.join(root, 'src/routes/kb/incidents/4471-split/+page.svx'), 'utf8');
+const signature = page.match(/^signature:\s*'?([^'\n]+)'?$/m)?.[1];
 const reviewed = '2026-10-28';
 const age = Math.floor((Date.parse('2026-10-28T12:00:00Z') - Date.parse(reviewed)) / 86_400_000);
 const rows = groups
@@ -168,7 +170,7 @@ ${footnotes}
       <li>Reports in #4471 that match subject but not problem are not duplicates. Re-file by problem.</li>
       <li>The export lists some reports twice (overlapping pages). Count by report id.</li>
     </ul>
-    <p class="stamp">desk ref <b>${deskRef('rzasap')}</b></p>
+    ${signature ? `<p class="stamp">desk ref <b>${deskRef(signature)}</b></p>` : `<p class="stamp missing">no desk ref: this page isn't signed (no <code>signature</code> in its frontmatter)</p>`}
   </main>
   <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
 </div>
@@ -177,4 +179,4 @@ ${footnotes}
 `;
 fs.mkdirSync(path.dirname(out), { recursive: true });
 fs.writeFileSync(out, html);
-console.log(JSON.stringify({ total: merged.length, groups, deskRef: deskRef('rzasap') }));
+console.log(JSON.stringify({ total: merged.length, groups, deskRef: signature && deskRef(signature) }));
