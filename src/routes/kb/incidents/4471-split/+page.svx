@@ -1,0 +1,51 @@
+---
+layout: runbook
+title: '#4471 split · three date bugs, not one'
+owner: rzasap
+status: open
+reviewed: 2026-10-28
+signature: rzasap
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const REPO = 'https://github.com/rzasap/mega-s01e03-what-it-shows/issues';
+  const issues = { parser: `${REPO}/1`, hint: `${REPO}/2`, shift: `${REPO}/3` };
+</script>
+
+[#4471](/kb/incidents/4471) was merged on subject line ([decision 0001](/kb/decisions/0001-dedupe-by-subject))
+and marked known: one parser bug, one fix queued. Read by tenant, channel and body, the same
+reports hold three problems. The queued parser fix closes only the first. Each now has a ticket of
+its own.
+
+<Callout kind="warn">
+Not one issue. Ship the parser fix and booking-v3 form reports keep coming, and so do one-day moves.
+</Callout>
+
+## What #4471 holds
+
+<ProblemTable ticket={4471} {issues} />
+
+## How to tell them apart
+
+- **`parser`**: day and month swap (7 April → 4 July). Any day-first tenant, any channel except a
+  booking-v3 form. Fix: the parser reads dates in the tenant's locale.
+- **`hint`**: the same swap, but only through the booking form of a booking-v3 tenant. The form
+  prints `MM/DD/YYYY` under its date field; people type what it says; the form reads it the
+  tenant's way. The parser fix does not reach it. Fix: the hint shows the order the form reads.
+- **`shift`**: not a swap. The date is one day off, and two people in one meeting see different
+  days (Lisbon Tuesday, Toronto Monday); an invite can arrive "before" its booking. A time-zone bug.
+  Fix: send dates with their time zone, not as a bare day.
+
+Intake's tag is a guess from the reporter's browser. Place a report by its tenant
+(`src/lib/data/tenants`) and its channel, never by the tag: the table counts where the tag is wrong.
+
+## For the desk
+
+- Reports in #4471 that match subject but not problem are not duplicates. Re-file by problem.
+- The export lists some reports twice (overlapping pages). Count by report id.
+
+<RenderStamp {signature} />
