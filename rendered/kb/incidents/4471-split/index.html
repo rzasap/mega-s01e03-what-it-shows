@@ -22,6 +22,7 @@
   aside.warn { border-color: var(--warn); background: var(--warn-bg); }
   .sum { font-size: 1.1rem; }
   .what { color: var(--muted); font-size: 0.85em; }
+  .note { color: var(--muted); font-size: 0.85em; }
   .stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); }
   .stamp b { color: var(--accent); letter-spacing: 0.04em; }
 </style>
@@ -42,25 +43,26 @@
     <h2>What #4471 holds</h2>
     <p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
     <table>
-      <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>intake mistagged</th><th>ticket</th></tr></thead>
+      <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
       <tbody>
       <tr>
         <td><code>parser</code><br /><span class="what">the shared parser reads every date month first: day and month swap</span></td>
-        <td>374</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td>23</td>
+        <td>379</td><td>11</td><td>2026-04-01 → 2026-10-04</td>
         <td><a href="https://github.com/rzasap/mega-s01e03-what-it-shows/issues/1">rzasap/mega-s01e03-what-it-shows#1</a></td>
       </tr>
       <tr>
         <td><code>hint</code><br /><span class="what">booking-v3 prints MM/DD/YYYY under its date field: people type month first, the form reads day first</span></td>
-        <td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td>15</td>
+        <td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td>
         <td><a href="https://github.com/rzasap/mega-s01e03-what-it-shows/issues/2">rzasap/mega-s01e03-what-it-shows#2</a></td>
       </tr>
       <tr>
         <td><code>shift</code><br /><span class="what">the date moves by one day, not a swap: it differs by time zone</span></td>
-        <td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td>5</td>
+        <td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td>
         <td><a href="https://github.com/rzasap/mega-s01e03-what-it-shows/issues/3">rzasap/mega-s01e03-what-it-shows#3</a></td>
       </tr>
       </tbody>
     </table>
+    <p class="note">5 of the <code>parser</code> reports read as a one-day move: counted under <code>parser</code> by tenant, and under <code>shift</code>.</p>
     <h2>How to tell them apart</h2>
     <ul>
       <li><strong><code>parser</code></strong>: day and month swap (7 April → 4 July). Any day-first tenant, any channel except a
@@ -73,7 +75,8 @@
       Fix: send dates with their time zone, not as a bare day.</li>
     </ul>
     <p>Intake's tag is a guess from the reporter's browser. Place a report by its tenant
-    (<code>src/lib/data/tenants</code>) and its channel, never by the tag: the table counts where the tag is wrong.</p>
+    (<code>src/lib/data/tenants</code>) and its channel, never by the tag. Counts are the desk's own view
+    (<code>causes.ts</code>): a one-day move stays counted where its tenant files it.</p>
     <h2>For the desk</h2>
     <ul>
       <li>Reports in #4471 that match subject but not problem are not duplicates. Re-file by problem.</li>

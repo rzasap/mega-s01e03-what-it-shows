@@ -41,7 +41,8 @@ Not one issue. Ship the parser fix and booking-v3 form reports keep coming, and 
   Fix: send dates with their time zone, not as a bare day.
 
 Intake's tag is a guess from the reporter's browser. Place a report by its tenant
-(`src/lib/data/tenants`) and its channel, never by the tag: the table counts where the tag is wrong.
+(`src/lib/data/tenants`) and its channel, never by the tag. Counts are the desk's own view
+(`causes.ts`): a one-day move stays counted where its tenant files it.
 
 ## For the desk
 

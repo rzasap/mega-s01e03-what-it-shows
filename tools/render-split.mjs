@@ -23,7 +23,7 @@ const dayFirst = (locale) => {
   return o.indexOf('day') < o.indexOf('month');
 };
 const causeOf = (r, t) => (!t || !dayFirst(t.locale) ? null : r.channel === 'form' && HINT[t.form].startsWith('MM') ? 'hint' : 'parser');
-const problemOf = (r) => (notes.oneDayMove.includes(r.id) ? 'shift' : causeOf(r, tenants.get(r.tenant)) ?? 'unplaced');
+const problemOf = (r) => causeOf(r, tenants.get(r.tenant)) ?? 'unplaced';
 
 const ALPHABET = '0123456789ABCDEFGHJKMNPQRSTVWXYZ';
 const fnv1a = (s, seed) => {
@@ -65,10 +65,19 @@ const groups = [...by.entries()]
       tenants: new Set(rs.map((r) => r.tenant)).size,
       first: days[0],
       last: days.at(-1),
-      mistagged: rs.filter((r) => r.meta.intakeTag !== problem).length,
+      alsoShift: rs.filter((r) => notes.oneDayMove.includes(r.id)).length,
     };
   })
   .sort((a, b) => b.n - a.n);
+{
+  const rs = merged.filter((r) => notes.oneDayMove.includes(r.id));
+  const days = rs.map((r) => r.receivedAt.slice(0, 10)).sort();
+  if (rs.length) groups.push({ problem: 'shift', n: rs.length, tenants: new Set(rs.map((r) => r.tenant)).size, first: days[0], last: days.at(-1), alsoShift: 0 });
+}
+const footnotes = groups
+  .filter((g) => g.alsoShift)
+  .map((g) => `    <p class="note">${g.alsoShift} of the <code>${g.problem}</code> reports read as a one-day move: counted under <code>${g.problem}</code> by tenant, and under <code>shift</code>.</p>`)
+  .join('\n');
 
 const reviewed = '2026-10-28';
 const age = Math.floor((Date.parse('2026-10-28T12:00:00Z') - Date.parse(reviewed)) / 86_400_000);
@@ -76,7 +85,7 @@ const rows = groups
   .map(
     (g) => `      <tr>
         <td><code>${g.problem}</code><br /><span class="what">${WHAT[g.problem] ?? 'no cause on file'}</span></td>
-        <td>${g.n}</td><td>${g.tenants}</td><td>${g.first} → ${g.last}</td><td>${g.mistagged}</td>
+        <td>${g.n}</td><td>${g.tenants}</td><td>${g.first} → ${g.last}</td>
         <td>${issues[g.problem] ? `<a href="${issues[g.problem]}">${issues[g.problem].replace('https://github.com/', '').replace('/issues/', '#')}</a>` : 'none yet'}</td>
       </tr>`,
   )
@@ -106,6 +115,7 @@ const html = `<!doctype html>
   aside.warn { border-color: var(--warn); background: var(--warn-bg); }
   .sum { font-size: 1.1rem; }
   .what { color: var(--muted); font-size: 0.85em; }
+  .note { color: var(--muted); font-size: 0.85em; }
   .stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); }
   .stamp b { color: var(--accent); letter-spacing: 0.04em; }
 </style>
@@ -126,11 +136,12 @@ const html = `<!doctype html>
     <h2>What #4471 holds</h2>
     <p class="sum"><strong>${merged.length}</strong> reports merged into #4471 · <strong>${groups.length}</strong> problems</p>
     <table>
-      <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>intake mistagged</th><th>ticket</th></tr></thead>
+      <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
       <tbody>
 ${rows}
       </tbody>
     </table>
+${footnotes}
     <h2>How to tell them apart</h2>
     <ul>
       <li><strong><code>parser</code></strong>: day and month swap (7 April → 4 July). Any day-first tenant, any channel except a
@@ -143,7 +154,8 @@ ${rows}
       Fix: send dates with their time zone, not as a bare day.</li>
     </ul>
     <p>Intake's tag is a guess from the reporter's browser. Place a report by its tenant
-    (<code>src/lib/data/tenants</code>) and its channel, never by the tag: the table counts where the tag is wrong.</p>
+    (<code>src/lib/data/tenants</code>) and its channel, never by the tag. Counts are the desk's own view
+    (<code>causes.ts</code>): a one-day move stays counted where its tenant files it.</p>
     <h2>For the desk</h2>
     <ul>
       <li>Reports in #4471 that match subject but not problem are not duplicates. Re-file by problem.</li>

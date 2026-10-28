@@ -10,6 +10,7 @@
 
   const split = $derived(splitTicket(reports as Report[], ticket, tenantOf, notes.oneDayMove));
   const issueOf = (p: string) => issues[p as Problem];
+  const label = (url: string) => url.replace('https://github.com/', '').replace('/issues/', '#');
 </script>
 
 <p class="sum">
@@ -20,7 +21,7 @@
 
 <table>
   <thead>
-    <tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>intake mistagged</th><th>ticket</th></tr>
+    <tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr>
   </thead>
   <tbody>
     {#each split.groups as g (g.problem)}
@@ -29,14 +30,20 @@
         <td>{g.ids.length}</td>
         <td>{g.tenants}</td>
         <td>{g.firstSeen} → {g.lastSeen}</td>
-        <td>{g.mistagged}</td>
-        <td>{#if issueOf(g.problem)}<a href={issueOf(g.problem)}>{issueOf(g.problem)?.replace('https://github.com/', '').replace('/issues/', '#')}</a>{:else}none yet{/if}</td>
+        <td>{#if issueOf(g.problem)}<a href={issueOf(g.problem)}>{label(issueOf(g.problem) ?? '')}</a>{:else}none yet{/if}</td>
       </tr>
     {/each}
   </tbody>
 </table>
 
+{#each split.groups as g (g.problem)}
+  {#if g.alsoShift}
+    <p class="note">{g.alsoShift} of the <code>{g.problem}</code> reports read as a one-day move: counted under <code>{g.problem}</code> by tenant, and under <code>shift</code>.</p>
+  {/if}
+{/each}
+
 <style>
   .sum { font-size: 1.1rem; }
   .what { color: var(--muted); font-size: 0.85em; }
+  .note { color: var(--muted); font-size: 0.85em; }
 </style>
