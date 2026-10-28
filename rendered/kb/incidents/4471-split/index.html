@@ -39,7 +39,8 @@
     and marked known: one parser bug, one fix queued. Read by tenant, channel and body, the same
     reports hold three problems. The queued parser fix closes only the first. Each now has a ticket of
     its own.</p>
-    <aside class="warn"><p>Not one issue. Ship the parser fix and booking-v3 form reports keep coming, and so do one-day moves.</p></aside>
+    <aside class="warn"><p>Not one issue. #4471 closed on 5 October with the parser fixed and booking-v3 retired. One-day
+    moves are neither: they stay open.</p></aside>
     <h2>What #4471 holds</h2>
     <p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
     <table>
@@ -63,6 +64,12 @@
       </tbody>
     </table>
     <p class="note">5 of the <code>parser</code> reports read as a one-day move: counted under <code>parser</code> by tenant, and under <code>shift</code>.</p>
+    <h2>Where each stands</h2>
+    <ul>
+      <li><strong><code>parser</code></strong>: fixed, <code>fix(dates): parse dd/mm for eu locales</code>. Ticket closed.</li>
+      <li><strong><code>hint</code></strong>: won't fix, the booking-v3 form is retired. Ticket closed as not planned.</li>
+      <li><strong><code>shift</code></strong>: open. Neither change touches it. Send new one-day moves to its ticket, not to #4471.</li>
+    </ul>
     <h2>How to tell them apart</h2>
     <ul>
       <li><strong><code>parser</code></strong>: day and month swap (7 April → 4 July). Any day-first tenant, any channel except a

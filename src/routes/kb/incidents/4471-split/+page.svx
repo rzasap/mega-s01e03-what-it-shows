@@ -22,12 +22,19 @@ reports hold three problems. The queued parser fix closes only the first. Each n
 its own.
 
 <Callout kind="warn">
-Not one issue. Ship the parser fix and booking-v3 form reports keep coming, and so do one-day moves.
+Not one issue. #4471 closed on 5 October with the parser fixed and booking-v3 retired. One-day
+moves are neither: they stay open.
 </Callout>
 
 ## What #4471 holds
 
 <ProblemTable ticket={4471} {issues} />
+
+## Where each stands
+
+- **`parser`**: fixed, `fix(dates): parse dd/mm for eu locales`. Ticket closed.
+- **`hint`**: won't fix, the booking-v3 form is retired. Ticket closed as not planned.
+- **`shift`**: open. Neither change touches it. Send new one-day moves to its ticket, not to #4471.
 
 ## How to tell them apart
 
