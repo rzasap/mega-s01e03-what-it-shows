@@ -34,3 +34,9 @@ Support desk. Decision records: whoever signed them.
 ---
 
 Exported 2026-10-04 from the `support` repo, `apps/kb/` → `src/`.
+
+## Rendering (added for MEGA.dev S01E03)
+
+`rendered/` is the kb as the desk sees it, built from `src/` with SvelteKit + mdsvex
+(`svelte.config.js`): `npm install && npx vite build`, then copy `build/` to `rendered/`.
+The page this repo adds: `rendered/kb/incidents/4471-split.html`.
